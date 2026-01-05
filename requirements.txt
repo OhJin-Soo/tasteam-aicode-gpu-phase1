@@ -1,0 +1,33 @@
+# Review Sentiment Analysis Requirements
+
+# Core dependencies
+transformers>=4.30.0
+torch>=2.0.0
+sentence-transformers>=2.2.0
+qdrant-client>=1.6.0
+accelerate>=0.20.0
+
+# API Framework
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+pydantic>=2.0.0
+
+# Data processing
+numpy>=1.24.0
+pandas>=2.0.0
+
+# Utilities
+python-dotenv>=1.0.0
+requests>=2.31.0
+
+# GPU Optimization (Phase 1 & 2)
+# Flash Attention-2: 메모리 효율 및 속도 향상
+# Note: 설치 시 --no-build-isolation 플래그 필요
+# flash-attn>=2.5.6 --no-build-isolation
+
+# vLLM: LLM 서빙 최적화 (Phase 2)
+# vllm>=0.3.3
+
+# Redis: 캐싱 시스템 (Phase 2)
+redis>=5.0.0
+
