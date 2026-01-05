@@ -21,3 +21,6 @@ QDRANT_URL=your-qdrant-url
 # Redis 설정 (Phase 2)
 REDIS_HOST=localhost
 REDIS_PORT=6379
+
+# app.py port
+PORT=8001  # 또는 다른 사용 가능한 포트
