@@ -1,0 +1,33 @@
+FROM runpod/pytorch:1.0.2-cu1281-torch280-ubuntu2404
+
+ENV PYTHONUNBUFFERED=1
+WORKDIR /app
+
+# 시스템 의존성
+RUN apt-get update --yes && \
+    DEBIAN_FRONTEND=noninteractive apt-get install --yes --no-install-recommends \
+        wget curl git build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Python 의존성 설치
+COPY requirements.txt /app/
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+
+# Flash Attention-2 설치
+RUN (pip install flash-attn==2.5.6 --no-build-isolation || echo "Flash Attention-2 설치 실패")
+
+# Hugging Face 설정 - 이미지 내부에 모델 저장
+ENV HF_HOME=/app/models
+ENV HF_HUB_ENABLE_HF_TRANSFER=0
+
+# 애플리케이션 코드 복사
+COPY . /app
+
+# 모델 사전 다운로드 (이미지에 포함)
+RUN python /app/download_models.py
+
+# Handler 파일 복사
+COPY handler.py /app/handler.py
+
+CMD ["python", "-c", "from handler import handler; import runpod; runpod.serverless.start({'handler': handler})"]

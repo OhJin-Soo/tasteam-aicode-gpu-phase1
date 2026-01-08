@@ -66,20 +66,20 @@
 │  │  │ Module       │  │ Module       │  │ Module       │         │  │
 │  │  │              │  │              │  │              │         │  │
 │  │  │ - analyze()  │  │ - query_     │  │ - classify_  │         │  │
-│  │  │ - 1차/2차    │  │   similar_   │  │   reviews()  │         │  │
-│  │  │   분류       │  │   reviews()  │  │ - summarize_ │         │  │
-│  │  │ - 비율 계산  │  │ - upsert_    │  │   reviews()  │         │  │
+│  │  │ - 1차/2차     │  │   similar_   │  │   reviews()  │         │  │
+│  │  │   분류        │  │   reviews()  │  │ - summarize_ │         │  │
+│  │  │ - 비율 계산    │  │ - upsert_    │  │   reviews()  │         │  │
 │  │  │              │  │   review()   │  │ - extract_   │         │  │
-│  │  │              │  │ - delete_    │  │   strengths() │         │  │
+│  │  │              │  │ - delete_    │  │   strengths()│         │  │
 │  │  │              │  │   review()   │  │              │         │  │
 │  │  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘         │  │
-│  │         │                  │                  │                 │  │
-│  │         │                  │                  │                 │  │
+│  │         │                  │                  │               │  │
+│  │         │                  │                  │               │  │
 │  │  ┌──────▼──────────────────▼──────────────────▼───────┐       │  │
-│  │  │  Review Utils Module (src/review_utils.py)        │       │  │
+│  │  │  Review Utils Module (src/review_utils.py)        │        │  │
 │  │  │  - get_review_list()                               │       │  │
-│  │  │  - extract_reviews_from_payloads()                │       │  │
-│  │  │  - extract_image_urls()                           │       │  │
+│  │  │  - extract_reviews_from_payloads()                │        │  │
+│  │  │  - extract_image_urls()                           │        │  │
 │  │  │  - validate_review_data()                          │       │  │
 │  │  │  - validate_restaurant_data()                      │       │  │
 │  │  └────────────────────────────────────────────────────┘       │  │
@@ -95,7 +95,7 @@
 │  (Sentiment) │    │ (Embedding)  │    │  (Local LLM) │
 │              │    │              │    │              │
 │  Dilwolf/    │    │ jhgan/ko-    │    │ Qwen/        │
-│  Kakao_app-  │    │ sbert-       │    │ Qwen2.5-14B- │
+│  Kakao_app-  │    │ sbert-       │    │ Qwen2.5-7B-  │
 │  kr_sentiment│    │ multitask    │    │ Instruct     │
 └──────────────┘    └──────┬───────┘    └──────────────┘
                             │
@@ -937,6 +937,26 @@ LLM Router만 비활성화
 ---
 
 ## 모듈 간 통신 흐름 예시
+
+┌────────────────────────────────────────────┐
+│                FastAPI 서버                 │  ← CPU 기반, Always On
+│--------------------------------------------│
+│ • /api/v1/sentiment                       │
+│ • /api/v1/summary                         │
+│ • /api/v1/vector                          │
+│--------------------------------------------│
+│ 내부에서:                                   │
+│    ├─ POST → CPU Vector Search API        │
+│    ├─ POST → GPU LLM Inference API        │
+│    └─ 결과 병합, 캐싱, 반환                    │
+└────────────────────────────────────────────┘
+                │               │
+                ▼               ▼
+     ┌────────────────┐   ┌────────────────┐
+     │  CPU Vector DB │   │ GPU LLM Server │
+     │ (Qdrant, Redis)│   │ (Serverless)   │
+     └────────────────┘   └────────────────┘
+
 
 ### 예시 1: 리뷰 요약 요청 처리
 

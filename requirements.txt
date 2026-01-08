@@ -6,6 +6,9 @@ torch>=2.0.0
 sentence-transformers>=2.2.0
 qdrant-client>=1.6.0
 accelerate>=0.20.0
+huggingface_hub>=0.20.0
+runpod>=1.0.0
+
 
 # API Framework
 fastapi>=0.104.0
